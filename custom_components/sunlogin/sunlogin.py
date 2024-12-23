@@ -904,12 +904,12 @@ class SunloginPlug(SunLoginDevice, ABC):
     @property
     def remote_address(self):
         remote_address = self.config.get(CONF_DEVICE_ADDRESS)
-        if remote_address is None:
-            return None
         if PLUG_API_VERSION == 1:
             return remote_address
-        elif PLUG_API_VERSION == 2 :
+        elif PLUG_API_VERSION == 2:
             return PLUG_URL
+        if remote_address is None:
+            return None
     
     @property
     def local_address(self):
@@ -1058,7 +1058,8 @@ class SunloginPlug(SunLoginDevice, ABC):
             r_json = resp.json()
             self._status.update(plug_status_process(r_json))
             self._available = True
-        except: 
+        except Exception as e: 
+            _LOGGER.debug(f"{self.name} (api.async_get_status): {e}")
             self._available = False
 
         self.write_ha_state()   
@@ -1070,7 +1071,8 @@ class SunloginPlug(SunLoginDevice, ABC):
             r_json = resp.json()
             self._status.update(plug_electric_process(r_json))
             self._available = True
-        except: 
+        except Exception as e: 
+            _LOGGER.debug(f"{self.name} (api.async_get_electric): {e}")
             self._available = False
 
         self.write_ha_state()
